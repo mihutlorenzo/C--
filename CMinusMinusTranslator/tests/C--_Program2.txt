@@ -1,0 +1,10 @@
+int main()
+{
+int number;
+number = 0;
+cout<<number;
+if( number != 0)
+cout<<"Number is 0!";
+cout<<"Malea are mere";
+return 0;
+}

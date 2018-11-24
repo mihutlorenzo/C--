@@ -5,7 +5,7 @@ package CMinusMinus;
 
 import java_cup.runtime.*;
 import java.io.*;
-
+import java_cup.sym;
 %%
 
 /* Options and declarations section */ 
@@ -45,10 +45,10 @@ import java.io.*;
 	  
 %} 
 
-LineEnd = \n|\r|\r\n 
+LineEnd = [\n|\r|\r\n]
 InputChar = [^\r\n]
-// WhiteSpace = {LineEnd} | [ \t\f]
-WhiteSpace = [ \t\f]*
+/* WhiteSpace = {LineEnd} | [ \t\f] */
+WhiteSpace = [ \t]
  
 LineComment = "//" {InputChar}* {LineEnd}
 LineCommentHash = "#" {InputChar}* {LineEnd}
@@ -68,11 +68,12 @@ Integer = {Zero} | {DecInt}
  
 %%
 <YYINITIAL> {
-   /* LineTerminator */
-  {LineEnd}								{ return token(ENDLINE, new Character(yytext().charAt(0))); }
+    /* LineTerminator */
+{LineEnd}								{ return token(ENDLINE, new Character(yytext().charAt(0)));  }
   
   /* Whitespace */
-  {WhiteSpace}	 									{ return token(WHITESPACE, new Character(yytext().charAt(0))); }
+{WhiteSpace}	 						{ return token(WHITESPACE, new Character(yytext().charAt(0))); }
+ 
   
    /* Comments */
   {Comment}                      	{ /* ignore */ }
@@ -123,14 +124,16 @@ Integer = {Zero} | {DecInt}
    "{" { return token(K_LBRKT); }
    "}" { return token(K_RBRKT); }
 
-   \"	{  string.setLength(0); yybegin(STRING); }
+   \"	{  string.setLength(0); yybegin(STRING); } 
    {Identifier} { return token(IDENTIFIER, yytext());}
    {Integer} { return token(INTEGER_LITERAL, new Integer(Integer.parseInt(yytext()))); }
-   
+  . 				{ return token(OTHER); }
+ <<EOF>>     { return token(EOF); }  
  }
  
  <STRING> {
 	\" 			{ yybegin(YYINITIAL);
+						string.append('\"');
 					 return token(STRING_LITERAL,string.toString());
 				}
 	[^\n\r\"\\]+                   { string.append( yytext() ); }
@@ -142,8 +145,8 @@ Integer = {Zero} | {DecInt}
   \\                             { string.append('\\'); }
 
  }
- . 				{ return token(OTHER); }
- <<EOF>>     { return token(EOF); }
+
+
 
 
 

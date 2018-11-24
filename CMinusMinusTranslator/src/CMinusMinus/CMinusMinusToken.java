@@ -43,6 +43,6 @@ public interface CMinusMinusToken {
 	  public static final int STRING_LITERAL = 38;
 	  public static final int IDENTIFIER = 39;
 	  public static final int INTEGER_LITERAL = 40;
-	  public static final int EOF = 41;
+	  public static final int EOF = -1;
 	  public static final int OTHER = 42;
 	}

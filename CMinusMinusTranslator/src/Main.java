@@ -7,7 +7,7 @@ public class Main {
 	public static void main( String[] argv ) throws IOException {
 		Reader reader;
 		try {
-			reader = new FileReader(new File("E:\\Repositories\\Github\\ProiectareaTranslatoarelor\\C--\\CMinusMinusTranslator\\tests\\C--_Program.txt"));
+			reader = new FileReader(new File("E:\\Repositories\\Github\\ProiectareaTranslatoarelor\\C--\\CMinusMinusTranslator\\tests\\C--_Program2.txt"));
 			/*CMinus2Lexer lexer = new CMinus2Lexer(reader);
 			lexer.yylex();*/
 			CMinusMinusLexer lexer = new CMinusMinusLexer(reader);
@@ -17,24 +17,25 @@ public class Main {
 			
 			BufferedWriter writer = new BufferedWriter(new FileWriter(logFile));
 			
-			
+			String rowText ="";
 			do {
-				String rowText ="";
-				current= lexer.next_token();
-				if(current.sym != sym.EOF)
+				
+				current = lexer.next_token();
+				if(current.sym != CMinusMinusToken.EOF)
 				{	
-					rowText += lexer.yytext(); 
-					System.out.println("Symbol value: " + lexer.yytext());
+					//rowText += lexer.yytext(); 
+					System.out.println("Symbol value: " + current.value);
 					System.out.println("Symbol token: " + current.sym);
-					if(current.sym == lexer.STRING_LITERAL)
+					if(current.value != null)
 					{
-						rowText += (String) current.value;
+						rowText += current.value;
 					}
 					
 				}
-				writer.write(rowText);
+
 			}
 			while(current.sym != lexer.EOF); 
+			writer.write(rowText);
 			writer.close();
 			reader.close();
 			System.out.println("EOF");
