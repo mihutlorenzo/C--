@@ -88,7 +88,7 @@ Integer = {Zero} | {DecInt}
    "/" { return token(O_DIV); }
  
 
-  "!" { return token(O_BANG); }
+  "!" { return token(O_NOT); }
    "&&" { return token(O_AND); }
    "||" { return token(O_OR); }
     "==" { return token(O_DEQL); }
@@ -102,7 +102,7 @@ Integer = {Zero} | {DecInt}
   
    "=" { return token(O_EQL); }
    ";" { return token(O_SEMICOLON); }
-   "," { return token(O_COMMA); }
+   "," { return token(O_COMA); }
    
    /* Keywords */
    "int"     { return token(K_INT); }
