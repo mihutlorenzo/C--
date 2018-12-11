@@ -1,0 +1,92 @@
+/* ----------------------Preliminary Declarations Section--------------------*/ 
+import java_cup.runtime.*;
+
+parser code {:
+  Lexer lexer;
+
+  public parser(Lexer lexer) {
+    this.lexer = lexer;
+  }
+
+  public void report_error(String message, Object info) {
+
+    StringBuffer m = new StringBuffer("Error");
+
+    if (info instanceof java_cup.runtime.Symbol) {
+
+      java_cup.runtime.Symbol s = ((java_cup.runtime.Symbol) info);
+
+      if (s.left >= 0) {
+
+        m.append(" in line "+(s.left+1));
+
+        if (s.right >= 0)
+
+          m.append(", column "+(s.right+1));
+        }
+    }
+
+    m.append(" : "+message);
+
+    System.err.println(m);
+  }
+
+  public void report_fatal_error(String message, Object info) {
+    report_error(message, info);
+    System.exit(1);
+    }
+:}; 
+
+scan with {: return lexer.yylex(); :};
+
+/* ------------Declaration of Terminals and Non Terminals Section----------- */ 
+
+terminal           SEMI, PLUS, MINUS, TIMES, DIVIDE, LPAREN, RPAREN;
+terminal Integer   NUMBER, ID; 
+
+non terminal Object     expr_list, expr_part;
+non terminal Integer    expr, factor, term;
+
+/* -------------Precedence and Associatively of Terminals Section----------- */ 
+
+precedence left PLUS, MINUS;
+precedence left TIMES, DIVIDE; 
+
+/* ----------------------------Grammar Section-------------------- */ 
+
+expr_list ::= expr_list expr_part
+              |expr_part; 
+			  
+expr_part ::= expr:e
+              {: System.out.println(" = " + e); :}
+              SEMI; 
+
+expr      ::= factor:f PLUS expr:e
+              {: RESULT = new Integer(f.intValue() + e.intValue()); :}
+              |
+              factor:f MINUS expr:e
+              {: RESULT = new Integer(f.intValue() - e.intValue()); :}
+              |
+              factor:f
+              {: RESULT = new Integer(f.intValue()); :}
+              ; 
+			  
+factor    ::= factor:f TIMES term:t
+              {: RESULT = new Integer(f.intValue() * t.intValue()); :}
+              |
+              factor:f DIVIDE term:t
+              {: RESULT = new Integer(f.intValue() / t.intValue()); :}
+              |
+              term:t
+              {: RESULT = new Integer(t.intValue()); :}
+              ; 	
+
+primary   ::= LPAREN expr:e RPAREN
+              {: RESULT = e; :}
+              |
+              NUMBER:n
+              {: RESULT = n; :}
+              |
+              ID:i
+              {: RESULT = i; :}
+              ; 			  
