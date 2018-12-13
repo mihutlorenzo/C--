@@ -1,4 +1,0 @@
-while(i<= 0) ana 
-i = i+1 
-a_23a = true
-"Ana are mere"

@@ -1,0 +1,225 @@
+/* Imported packages */
+
+import java_cup.runtime.*;
+
+
+parser code {:
+  CMinusMinusLexer lexer;
+
+  public parser(CMinusMinusLexer lexer) {
+    this.lexer = lexer;
+  }
+
+  public void report_error(String message, Object info) {
+
+    StringBuffer m = new StringBuffer("Error");
+
+    if (info instanceof java_cup.runtime.Symbol) {
+
+      java_cup.runtime.Symbol s = ((java_cup.runtime.Symbol) info);
+
+      if (s.left >= 0) {
+
+        m.append(" in line "+(s.left+1));
+
+        if (s.right >= 0)
+
+          m.append(", column "+(s.right+1));
+        }
+    }
+
+    m.append(" : "+message);
+
+    System.err.println(m);
+  }
+
+  public void report_fatal_error(String message, Object info) {
+    report_error(message, info);
+    System.exit(1);
+    }
+:}; 
+
+
+/* define how to connect to the scanner! */
+scan with {: return lexer.next_token(); :};
+
+
+/* ------------Declaration of Terminals and Non Terminals Section----------- */
+
+terminal O_SUB;
+terminal O_ADD;
+terminal O_MULT;
+terminal O_DIV;
+terminal O_NOT;
+terminal O_AND;
+terminal O_OR;
+terminal O_DEQL;
+terminal O_NOTEQL;
+terminal O_LT;
+terminal O_GT;
+terminal O_GE;
+terminal O_LE;
+terminal O_RSHIFT;
+terminal O_LSHIFT;
+terminal O_EQL;
+terminal O_SEMICOLON;
+terminal O_COMA;
+
+
+terminal K_INT;
+terminal K_BOOL;
+terminal K_TRUE;
+terminal K_FALSE;
+terminal K_VOID;
+terminal K_IF;
+terminal K_ELSE;
+terminal K_WHILE;
+terminal K_RETURN;
+terminal K_CIN;
+terminal K_COUT;
+terminal K_LPAREN;
+terminal K_RPAREN;
+terminal K_LSQBKT;
+terminal K_RSQBKT;
+terminal K_LBRKT;
+terminal K_RBRKT;
+
+terminal ENDLINE;
+terminal WHITESPACE;
+terminal COMMENT;
+
+terminal String IDENTIFIER;
+terminal Integer INTEGER_LITERAL;
+terminal String STRING_LITERAL;
+
+/* Non Terminals used in the Grammar Section.*/
+
+non terminal     program;
+non terminal 	 varDecl;
+non terminal     type;
+non terminal 	 fnDecl;
+non terminal     parameters;
+non terminal 	 formalsList;
+non terminal     formalDecl;
+non terminal 	 block;
+
+non terminal     declList;
+non terminal 	 stmtList;
+non terminal     stmt;
+non terminal     exp;
+non terminal 	Object	 atom;
+non terminal     fnCallExpr;
+non terminal 	 fnCallStmt;
+non terminal     actualList;
+non terminal 	 subscriptExpr;
+non terminal 	 id;
+
+
+precedence left O_NOT;
+precedence left O_MULT, O_DIV;
+precedence left O_ADD,O_SUB;
+precedence left O_LT,O_LE,O_GT,O_GE,O_DEQL,O_NOTEQL;
+precedence left O_AND;
+precedence left O_OR;
+
+start with program;
+
+program ::= program var
+Decl
+		| 	program fnDecl
+		|
+		;
+
+varDecl ::= type id O_SEMICOLON
+		| type id  O_EQL  INTEGER_LITERAL  O_SEMICOLON
+		| type id  O_EQL  id  O_SEMICOLON
+		| type id K_LSQBKT INTEGER_LITERAL K_RSQBKT O_SEMICOLON
+		;
+		
+type ::=  K_INT
+		| K_BOOL
+		| K_VOID
+		;
+		
+fnDecl ::= type id parameters block 
+		;
+		
+parameters ::= K_LPAREN K_RPAREN
+			| K_LPAREN formalsList K_RPAREN
+			;
+			
+formalsList ::= formalDecl
+			| formalsList O_COMA formalDecl
+			;
+			
+formalDecl ::= type id
+			;
+			
+block ::= K_LBRKT declList stmtList K_RBRKT 
+		;
+		
+declList ::= declList varDecl
+		|	
+		;
+		
+stmtList ::= stmtList stmt
+		|	
+		;
+		
+stmt ::= K_CIN id O_SEMICOLON
+	|	 K_CIN id K_LSQBKT exp K_RSQBKT O_SEMICOLON
+	|	 K_COUT exp O_SEMICOLON
+	|	 subscriptExpr O_EQL exp O_SEMICOLON
+	|	 id O_EQL exp O_SEMICOLON
+	| 	 K_IF K_LPAREN exp K_RPAREN block
+	|  	 K_IF K_LPAREN exp K_RPAREN block K_ELSE block
+	|	 K_WHILE K_LPAREN exp K_RPAREN block
+	|	 K_RETURN exp O_SEMICOLON
+	| 	 K_RETURN O_SEMICOLON
+	|	 fnCallStmt O_SEMICOLON
+	;
+	
+exp ::= exp O_ADD exp
+	|	exp O_SUB exp
+	|	exp O_MULT exp
+	|	exp O_DIV exp
+	|	O_NOT exp
+	|	exp O_AND exp
+	|	exp O_OR exp
+	|   exp O_DEQL exp
+	| 	exp O_NOTEQL exp
+	|	exp O_LT exp
+	|	exp O_GT exp
+	|	exp O_LE exp
+	| 	exp O_GE exp
+	| 	O_SUB atom
+	|	atom
+	;
+	
+atom ::= INTEGER_LITERAL
+	|	STRING_LITERAL
+	|	K_TRUE
+	|	K_FALSE
+	|	K_LPAREN exp K_RPAREN
+	| 	fnCallExpr
+	|	subscriptExpr
+	|	id
+	;
+	
+fnCallExpr ::= id K_LPAREN K_RPAREN
+			|  id K_LPAREN actualList K_RPAREN
+			;
+			
+fnCallStmt ::= id K_LPAREN K_RPAREN
+			|  id K_LPAREN actualList K_RPAREN
+			;
+			
+actualList ::= exp 
+			|  actualList O_COMA exp
+			;
+			
+subscriptExpr ::= id K_LSQBKT exp K_RSQBKT
+				;
+				
+id ::= IDENTIFIER
+	;

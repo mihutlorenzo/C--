@@ -1,0 +1,11 @@
+void setInt(int value)
+{
+	int number = value;
+}
+int a =4;
+int add(int nr1, int nr2)
+{
+	setInt(nr1);
+	return nr1 + nr2;
+}
+bool vector[4];

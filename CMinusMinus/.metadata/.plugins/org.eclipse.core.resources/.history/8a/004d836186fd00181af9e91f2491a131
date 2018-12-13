@@ -1,0 +1,24 @@
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.UnsupportedEncodingException;
+
+import java_cup.Lexer;
+
+public class Program {
+
+	public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException  {
+		 try {
+	            parser p = new parser(new Lexer(new FileReader("src/input.txt")));
+//	            Object result = p.parse().value;
+	            System.out.println("aaaaaa");
+	            p.debug_parse();
+	       
+	     } catch (Exception e) {
+	        	  e.printStackTrace();
+	     } finally {
+	              /* do close out here */
+	     }
+
+	}
+
+}
